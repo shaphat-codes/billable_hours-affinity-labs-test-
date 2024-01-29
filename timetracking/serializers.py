@@ -25,7 +25,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
  
     class Meta:
         model = Invoice
-        fields = ('__all__')
+        fields = ('id', 'employee_id', 'company', 'duration', 'unit_price', 'cost')
 
     def create(self, validated_data):
         return Invoice.objects.create(**validated_data)
