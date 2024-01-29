@@ -20,3 +20,13 @@ Run the Django server
 ```bash
 python manage.py runserver
 ```
+
+### Using Docker
+Build the docker container
+```bash
+docker build -t billable_hours .
+```
+Run docker container
+```bash
+docker run -p 8000:8000 --name billable_hours_container billable_hours
+```
