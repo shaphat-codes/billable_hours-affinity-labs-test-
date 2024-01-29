@@ -21,8 +21,14 @@ class Timetable(models.Model):
 class Invoice(models.Model):
     employee_id = models.PositiveIntegerField(null=True, blank=True)
     company = models.CharField(max_length=255)
-    number_of_hours = models.CharField(max_length=255)
+    number_of_hours = models.DurationField()
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     cost = models.DecimalField(max_digits=10, decimal_places=2)
     # total = models.DecimalField(max_digits=20, decimal_places=2)
+
+    def get_formatted_duration(self):
+        total_seconds = self.number_of_hours.total_seconds()
+        hours, remainder = divmod(total_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f"{int(hours)} hours and {int(minutes)} minutes"
 

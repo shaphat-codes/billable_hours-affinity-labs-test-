@@ -31,9 +31,11 @@ class TimetableProcessor:
             return Response({"error": "File not provided."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            # decoding csv file and storing content in a list
             csv_content = self.csv_file.read().decode('utf-8')
             self.csv_data = list(csv.reader(csv_content.splitlines()))
 
+            # assuming first row is the header
             header = self.csv_data[0] if self.csv_data else []
             self.csv_data = self.csv_data[1:] if self.csv_data else []
 
@@ -51,22 +53,31 @@ class TimetableProcessor:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def _save_timetable_data(self, data):
+        timetable_objects = []
+
         for row in data:
             try:
-                Timetable.objects.create(
-                    employee_id=row['employee_id'],
-                    billable_rate=row['billable_rate'],
-                    project=row['project'],
-                    date=row['date'],
-                    start_time=row['start_time'],
-                    end_time=row['end_time']
+                timetable_objects.append(
+                    Timetable(
+                        employee_id=row['employee_id'],
+                        billable_rate=row['billable_rate'],
+                        project=row['project'],
+                        date=row['date'],
+                        start_time=row['start_time'],
+                        end_time=row['end_time']
+                    )   
                 )
             except Exception as e:
                 logger.error(f"Error creating the entry: {e}")
 
+        try:
+            Timetable.objects.bulk_create(timetable_objects)
+        except Exception as e:
+            logger.error(f"Error bulk creating timetable entries: {e}")
+
     def _save_invoice_data(self, data):
-        total_cost = 0
         invoices = []
+        total_cost = 0
 
         for row in data:
             start_time = datetime.combine(datetime.today(), row['start_time'])
@@ -80,19 +91,25 @@ class TimetableProcessor:
             total_cost += cost
 
             try:
-                invoice = Invoice.objects.create(
+                invoices.append(Invoice(
                     company=row['project'],
                     employee_id=row['employee_id'],
-                    number_of_hours=f"{hours} hours and {minutes} minutes",
+                    number_of_hours=time_difference,
                     unit_price=row['billable_rate'],
                     cost=cost,
-                )
-                invoices.append(invoice)
+                ))
             except Exception as e:
-                return Response({"error": "Invoice was not created"}, status=status.HTTP_400_BAD_REQUEST)
+                logger.error(f"Error creating the invoice: {e}")
 
-        serializer = InvoiceSerializer(invoices, many=True)
-        serialized_response = [{"total": total_cost}, serializer.data]
+        try:
+            Invoice.objects.bulk_create(invoices)
+        except Exception as e:
+            logger.error(f"Error bulk creating invoices: {e}")
+            return Response({"error": "Invoices were not created"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serialized_invoices = InvoiceSerializer(invoices, many=True).data
+        serialized_response = [{"total": total_cost}, serialized_invoices]
+
         return Response(serialized_response, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
