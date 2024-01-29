@@ -30,3 +30,13 @@ Run docker container
 ```bash
 docker run -p 8000:8000 --name billable_hours_container billable_hours
 ```
+
+## Tests
+Tests were written using django tests (timetracking/tests.py)
+To run tests, run the command below in the project's root directory
+```bash
+python manage.py test
+```
+
+## API Testing
+Click [here](https://www.postman.com/supply-specialist-10494686/workspace/affinity-labs/collection/26840405-457318da-fe47-4901-a3e7-ef89472d2fd3?action=share&creator=26840405) to test the endpoints in postman.
