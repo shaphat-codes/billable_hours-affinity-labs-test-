@@ -122,3 +122,5 @@ C:\Users\USER\Desktop\external projects\affinity_labs_take-home_assessment\billa
 Watching for file changes with StatReloader
 "POST /api/v1/timetable HTTP/1.1" 201 496
 "POST /api/v1/timetable HTTP/1.1" 201 496
+Watching for file changes with StatReloader
+"POST /api/v1/timetable HTTP/1.1" 201 496
