@@ -38,5 +38,8 @@ To run tests, run the command below in the project's root directory
 python manage.py test
 ```
 
+## Sample response
+![Local Image](sample_response.jpg)
+
 ## API Testing
 Click [here](https://www.postman.com/supply-specialist-10494686/workspace/affinity-labs/collection/26840405-457318da-fe47-4901-a3e7-ef89472d2fd3?action=share&creator=26840405) to test the endpoints in postman.
