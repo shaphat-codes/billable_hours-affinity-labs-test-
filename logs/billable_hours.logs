@@ -585,3 +585,8 @@ Watching for file changes with StatReloader
 "POST /api/v1/timetable HTTP/1.1" 200 2055
 C:\Users\USER\Desktop\external projects\affinity_labs_take-home_assessment\billable_hours\timetracking\views.py changed, reloading.
 Watching for file changes with StatReloader
+Bad Request: /api/v1/timetable
+Bad Request: /api/v1/timetable
+Not Found: /api/v1/timetables
+Bad Request: /api/v1/timetable
+Bad Request: /api/v1/timetable

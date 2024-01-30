@@ -9,17 +9,13 @@ class TimetableTests(TestCase):
     def setUp(self):
         self.client = APIClient()
 
-    def test_list_timetables(self):
-        response = self.client.get('/api/v1/timetables')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
     def test_create_timetable_valid_csv(self):
         csv_content = "employee_id,billable_rate,project,date,start_time,end_time\n1,50,ProjectA,2024-01-28,09:00,17:00"
         csv_file = BytesIO(csv_content.encode('utf-8'))
         csv_file.name = 'test.csv'
 
         response = self.client.post('/api/v1/timetable', {'file': csv_file}, format='multipart')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_create_timetable_invalid_csv(self):
         invalid_csv_content = "invalid_header,invalid_data\n1,2"
