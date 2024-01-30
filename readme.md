@@ -42,5 +42,5 @@ Click [here](https://www.postman.com/supply-specialist-10494686/workspace/affini
 
 
 ## Sample response
-![sample response image](./images/sample_response.JPG)
+![sample response image](./images/sampleresponse.JPG)
 
