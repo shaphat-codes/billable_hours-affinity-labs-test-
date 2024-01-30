@@ -106,7 +106,6 @@ class TimetableProcessor:
             logger.error(f"Error bulk creating invoices: {e}")
             return Response({"error": "Invoices were not created"}, status=status.HTTP_400_BAD_REQUEST)
         
-
         serialized_invoices = InvoiceSerializer(invoices, many=True).data
         serialized_response = [{"total": total_cost}, serialized_invoices]
         timestamp = datetime.now().strftime("%Y-%m-%d %H_%M_%S.%f")[:-3]
