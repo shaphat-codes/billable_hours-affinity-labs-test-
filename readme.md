@@ -39,7 +39,7 @@ python manage.py test
 ```
 
 ## Sample response
-![Local Image](./images/sample_response.jpg)
+![sample response image](./images/sample_response.JPG)
 
 ## API Testing
 Click [here](https://www.postman.com/supply-specialist-10494686/workspace/affinity-labs/collection/26840405-457318da-fe47-4901-a3e7-ef89472d2fd3?action=share&creator=26840405) to test the endpoints in postman.
