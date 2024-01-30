@@ -11,16 +11,10 @@ from datetime import datetime
 import logging
 from .pdf_generator import *
 from datetime import datetime
+from django.http import HttpResponse
 
 
 logger = logging.getLogger(__name__)
-
-@api_view(['GET'])
-def list_timetables(request):
-    if request.method == 'GET':
-        timetables = Timetable.objects.all()
-        serializer = TimetableCSVSerializer(timetables, many=True)
-        return Response(serializer.data)
 
 class TimetableProcessor:
 
@@ -117,7 +111,61 @@ class TimetableProcessor:
         timestamp = datetime.now().strftime("%Y-%m-%d %H_%M_%S.%f")[:-3]
         generate_pdf(f"output/invoice{timestamp}.pdf", serialized_response)
 
-        return Response(serialized_response, status=status.HTTP_201_CREATED)
+        with open(f"output/invoice{timestamp}.pdf", 'rb') as pdf_file:
+            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="{f"output/invoice{timestamp}.pdf"}"'
+
+        return response
+
+        # return Response(serialized_response, status=status.HTTP_201_CREATED)
+    
+
+    def _serve_invoice_pdf(self, data):
+        
+        invoices = []
+        total_cost = 0
+
+        for row in data:
+            start_time = datetime.combine(datetime.today(), row['start_time'])
+            end_time = datetime.combine(datetime.today(), row['end_time'])
+
+            time_difference = end_time - start_time
+            hours, remainder = divmod(time_difference.seconds, 3600)
+            minutes = remainder // 60
+
+            cost = row['billable_rate'] * hours
+            total_cost += cost
+
+            try:
+                invoices.append(Invoice(
+                    company=row['project'],
+                    employee_id=row['employee_id'],
+                    number_of_hours=time_difference,
+                    unit_price=row['billable_rate'],
+                    cost=cost,
+                ))
+            except Exception as e:
+                logger.error(f"Error creating the invoice: {e}")
+
+        try:
+            Invoice.objects.bulk_create(invoices)
+        except Exception as e:
+            logger.error(f"Error bulk creating invoices: {e}")
+            return Response({"error": "Invoices were not created"}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+        serialized_invoices = InvoiceSerializer(invoices, many=True).data
+        serialized_response = [{"total": total_cost}, serialized_invoices]
+        timestamp = datetime.now().strftime("%Y-%m-%d %H_%M_%S.%f")[:-3]
+        generate_pdf(f"output/invoice{timestamp}.pdf", serialized_response)
+
+        with open(f"output/invoice{timestamp}.pdf", 'rb') as pdf_file:
+            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="{f"output/invoice{timestamp}.pdf"}"'
+
+        return response
+
+        # return Response(serialized_response, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
 @parser_classes([parsers.MultiPartParser])
