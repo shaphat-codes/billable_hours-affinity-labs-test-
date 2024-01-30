@@ -9,6 +9,9 @@ from .serializers import *
 from rest_framework import status, parsers
 from datetime import datetime
 import logging
+from .pdf_generator import *
+from datetime import datetime
+
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +79,7 @@ class TimetableProcessor:
             logger.error(f"Error bulk creating timetable entries: {e}")
 
     def _save_invoice_data(self, data):
+        
         invoices = []
         total_cost = 0
 
@@ -106,9 +110,12 @@ class TimetableProcessor:
         except Exception as e:
             logger.error(f"Error bulk creating invoices: {e}")
             return Response({"error": "Invoices were not created"}, status=status.HTTP_400_BAD_REQUEST)
+        
 
         serialized_invoices = InvoiceSerializer(invoices, many=True).data
         serialized_response = [{"total": total_cost}, serialized_invoices]
+        timestamp = datetime.now().strftime("%Y-%m-%d %H_%M_%S.%f")[:-3]
+        generate_pdf(f"output/invoice{timestamp}.pdf", serialized_response)
 
         return Response(serialized_response, status=status.HTTP_201_CREATED)
 
